@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Noël en famille</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20x='8'%20y='26'%20width='48'%20height='32'%20rx='4'%20fill='%23B3202A'/%3E%3Crect%20x='5'%20y='18'%20width='54'%20height='12'%20rx='3'%20fill='%238E1721'/%3E%3Crect%20x='28'%20y='18'%20width='8'%20height='40'%20fill='%23C79A3B'/%3E%3Cellipse%20cx='23'%20cy='11'%20rx='9'%20ry='5.5'%20transform='rotate%28-20%2023%2011%29'%20fill='none'%20stroke='%23C79A3B'%20stroke-width='4'/%3E%3Cellipse%20cx='41'%20cy='11'%20rx='9'%20ry='5.5'%20transform='rotate%2820%2041%2011%29'%20fill='none'%20stroke='%23C79A3B'%20stroke-width='4'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -260,17 +261,13 @@ function homeView(){
       const ws = st.wishes.filter(w=>w.pourId===m.id);
       const isMe = m.id===st.me.id;
       const left = ws.filter(w=>!w.mine && !w.achete).length;
-      const open = !!S.open[m.id];
       const go = ()=>{S.view='person';S.personId=m.id;render();};
-      const toggle = ()=>{ S.open[m.id] = !S.open[m.id]; render(); };
       return h('div',{class:'ptile'+(isMe?' me':'')},
         h('div',{class:'ptop'},
           h('button',{class:'pmain',onclick:go,title:'Ouvrir la liste détaillée'}, avatar(m),
             h('div',{class:'ptxt'}, h('span',{class:'pname'}, isMe ? 'Ma liste' : m.prenom),
-              h('span',{class:'meta'}, ws.length+' souhait'+(ws.length>1?'s':'') + (!isMe && ws.length ? ' · '+left+' à offrir' : '')))),
-          h('button',{class:'tog',title:open?'Masquer les souhaits':'Voir les souhaits','aria-expanded':String(open),onclick:toggle},
-            h('span',{class:'tri'+(open?' on':'')},'▶'))),
-        open && (ws.length ? h('ul',{class:'wl'}, ws.map(w=>{
+              h('span',{class:'meta'}, ws.length+' souhait'+(ws.length>1?'s':'') + (!isMe && ws.length ? ' · '+left+' à offrir' : ''))))),
+        (ws.length ? h('ul',{class:'wl'}, ws.map(w=>{
           const hasC = !w.mine && st.contribs.some(c=>c.souhaitId===w.id);
           const dot = w.mine ? h('span',{class:'st plain'})
             : w.achete ? h('span',{class:'st ok',title:'Acheté'},'✓')
