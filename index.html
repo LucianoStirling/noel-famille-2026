@@ -109,7 +109,7 @@ function h(tag, props, ...kids){
   kids.flat(Infinity).forEach(c => { if (c==null||c===false) return; e.append(c.nodeType ? c : String(c)); });
   return e;
 }
-const API = 'COLLE_ICI_TON_URL_APPS_SCRIPT_/exec';   // URL du déploiement Apps Script (se termine par /exec)
+const API = 'https://script.google.com/macros/s/AKfycbya3Fg7If8edUEPt2UkhvZyBbRaN9JFHfxLD4iTZhPD37im4k6mc6MBOsYiR5ex3LXrnA/exec';   // URL du déploiement Apps Script (se termine par /exec)
 async function call(fn, arg = {}){
   if (arg && typeof arg==='object' && S.tok) arg.token = S.tok;       // jeton de session ajouté à chaque appel
   const r = await fetch(API, { method:'POST',
