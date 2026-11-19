@@ -53,7 +53,7 @@ main{padding:14px 0 60px}
 .section h3{font-size:1rem;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .section h3 .count{background:var(--green-l);color:var(--green);font-family:'DM Sans',sans-serif;font-size:.8rem;border-radius:999px;padding:2px 10px}
 .card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:8px;box-shadow:0 2px 10px rgba(80,40,20,.06)}
-.grid.fam{display:block;column-width:290px;column-gap:10px}
+.grid.fam{display:block;column-width:320px;column-gap:10px}
 .ptile{break-inside:avoid;margin-bottom:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .ptile.me{border-color:var(--green);background:var(--green-l)}
 .ptop{display:flex;align-items:stretch}
@@ -62,6 +62,7 @@ main{padding:14px 0 60px}
 .ptxt{min-width:0}
 .pname{font-family:'Fraunces',serif;font-size:1.05rem;display:block}
 .ptile .meta{color:var(--mute);font-size:.75rem;font-weight:400;display:block}
+.cta{align-self:center;margin-right:8px;white-space:nowrap;flex:none}
 .tog{background:none;box-shadow:none;color:var(--mute);padding:0 16px;border-radius:0;border-left:1px solid var(--line)}
 .tog:hover{color:var(--red);background:rgba(199,154,59,.08)}
 .tri{display:inline-block;transition:transform .15s;font-size:1.5rem;line-height:1}
@@ -269,6 +270,7 @@ function homeView(){
           h('button',{class:'pmain',onclick:go,title:'Ouvrir la liste détaillée'}, avatar(m),
             h('div',{class:'ptxt'}, h('span',{class:'pname'}, isMe ? 'Ma liste' : m.prenom),
               h('span',{class:'meta'}, ws.length+' souhait'+(ws.length>1?'s':'') + (!isMe && ws.length ? ' · '+left+' à offrir' : '')))),
+          h('button',{class:'btn sm cta'+(isMe?'':' green'),onclick:go},isMe?'Ma liste':'Contribuer'),
           h('button',{class:'tog',title:collapsed?'Voir les souhaits':'Masquer les souhaits','aria-expanded':String(!collapsed),onclick:toggle},
             h('span',{class:'tri'+(collapsed?'':' on')},'›'))),
         !collapsed && (ws.length ? h('ul',{class:'wl'}, ws.map(w=>{
@@ -348,7 +350,7 @@ function wishCard(w, {editWish, me}){
         onSubmit:v=>act('addContribution',{viewerId:me.id,wishId:w.id,montant:v.montant,note:v.note})})},'Je contribue'),
       h('button',{class:'btn sm ghost',onclick:()=>act('setBought',{viewerId:me.id,id:w.id,achete:!w.achete})}, w.achete?'Remettre à offrir':'Marquer acheté'));
   }
-  row.append(h('span',{class:'sp'}),
+  if (w.canEdit) row.append(h('span',{class:'sp'}),
     h('button',{class:'lnk',onclick:()=>editWish(w)},'Modifier'),
     h('button',{class:'lnk',onclick:()=>{ if(confirm('Supprimer « '+w.titre+' » ?')) act('deleteWish',{viewerId:me.id,id:w.id}); }},'Supprimer'));
   return h('div',{class:'card'+(!w.mine&&w.achete?' done':'')+(!w.mine&&w.surprise?' surprise':'')},
