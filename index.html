@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noël en famille</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#B3202A; --red-d:#8E1721; --green:#1F5D46; --green-l:#E4F0EA; --gold:#C79A3B;
+  --cream:#FBF6EC; --card:#FFFFFF; --ink:#2A2320; --mute:#7A6E66; --line:#EADFCF;
+  --radius:18px; --shadow:0 6px 24px rgba(80,40,20,.08);
+}
+*{box-sizing:border-box}
+body{margin:0;font-size:14px;font-family:'DM Sans',system-ui,sans-serif;color:var(--ink);background:var(--cream);
+  background-image:radial-gradient(circle at 20px 20px,rgba(199,154,59,.14) 2px,transparent 3px);background-size:48px 48px;min-height:100vh}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;margin:0;line-height:1.15}
+button{font:inherit;cursor:pointer;border:0;border-radius:999px;padding:.5em 1em;font-weight:700;transition:transform .08s,box-shadow .15s}
+button:active{transform:scale(.97)}
+.btn{background:var(--red);color:#fff;box-shadow:0 3px 10px rgba(179,32,42,.28)}
+.btn:hover{background:var(--red-d)}
+.btn.green{background:var(--green);box-shadow:0 3px 10px rgba(31,93,70,.28)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
+.btn.ghost:hover{background:#fff}
+.btn.sm{padding:.3em .75em;font-size:.8rem}
+.lnk{background:none;box-shadow:none;color:var(--mute);font-weight:500;font-size:.8rem;padding:.3em .4em;text-decoration:underline;text-underline-offset:2px}
+.lnk:hover{color:var(--red)}
+.row .sp{flex:1}
+.btn:disabled{opacity:.5;cursor:default}
+header{background:linear-gradient(135deg,var(--red),var(--red-d));color:#fff;padding:12px 16px 14px;border-radius:0 0 20px 20px;box-shadow:var(--shadow)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+@media(max-width:760px){.cols{grid-template-columns:1fr;gap:0}}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:0}
+header h1{font-size:1.3rem}
+header small{opacity:.85;display:block;margin-top:2px;font-size:.8rem}
+header .btn{background:rgba(255,255,255,.18);box-shadow:none}
+header .btn:hover{background:rgba(255,255,255,.3)}
+main{padding:14px 0 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.person{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);padding:12px 10px;text-align:center;box-shadow:var(--shadow);cursor:pointer;transition:transform .12s,border-color .12s;width:100%;color:var(--ink);border-radius:var(--radius)}
+.person:hover{transform:translateY(-3px);border-color:var(--gold)}
+.person .name{font-family:'Fraunces',serif;font-size:1rem;margin-top:6px;display:block}
+.person .meta{color:var(--mute);font-size:.75rem;font-weight:400;display:block;margin-top:2px}
+.avatar{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-family:'Fraunces',serif;font-size:1.2rem}
+.person.me{border-color:var(--green);background:var(--green-l)}
+.bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:4px 0 10px}
+.bar h2{font-size:1.3rem}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.section{margin-top:14px}
+.section h3{font-size:1rem;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.section h3 .count{background:var(--green-l);color:var(--green);font-family:'DM Sans',sans-serif;font-size:.8rem;border-radius:999px;padding:2px 10px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:8px;box-shadow:0 2px 10px rgba(80,40,20,.06)}
+.card.surprise{background:#FFF8E1;border-color:var(--gold);border-width:2px}
+.sep{display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:#7A5A12;font-family:'Fraunces',serif;font-weight:700;font-size:.95rem}
+.sep::before,.sep::after{content:"";flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.card.done{background:#F4EFE6;border-style:dashed}
+.card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .title{font-weight:700;font-size:.95rem}
+.card .desc{color:var(--mute);font-size:.85rem;margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:.72rem;border-radius:999px;padding:2px 8px;background:var(--green-l);color:var(--green);font-weight:500}
+.tag.gold{background:#F8EBCB;color:#7A5A12}
+.tag.x{cursor:pointer}
+.card .row{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.empty{color:var(--mute);text-align:center;padding:16px;font-size:.85rem;border:1.5px dashed var(--line);border-radius:var(--radius)}
+.note{background:#FFF;border-left:3px solid var(--gold);padding:6px 12px;border-radius:8px;color:var(--mute);font-size:.8rem;margin-bottom:6px}
+.overlay{position:fixed;inset:0;background:rgba(42,35,32,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal{background:#fff;border-radius:22px;padding:22px;width:100%;max-width:420px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal h3{margin-bottom:14px}
+.modal label{display:block;font-size:.85rem;font-weight:700;margin:12px 0 4px}
+.modal input,.modal textarea{width:100%;font:inherit;padding:.65em .8em;border:1.5px solid var(--line);border-radius:12px;background:var(--cream)}
+.modal input:focus,.modal textarea:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.7em 1.2em;border-radius:999px;z-index:20;max-width:90vw}
+.toast.err{background:var(--red-d)}
+.hello{text-align:center;padding:30px 0 10px}
+.hello h2{font-size:2rem}
+.hello p{color:var(--mute)}
+.add-inline{display:flex;gap:8px;max-width:420px;margin:24px auto 0}
+.add-inline input{flex:1;font:inherit;padding:.65em 1em;border:1.5px solid var(--line);border-radius:999px;background:#fff}
+.loading{text-align:center;color:var(--mute);padding:60px 0}
+.total{font-weight:700}
+@media(max-width:520px){.bar h2{font-size:1.15rem}.grid{grid-template-columns:repeat(2,1fr)}.wrap{padding:0 12px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div><h1 id="hTitle">Noël en famille</h1><small id="hSub"></small></div>
+  <div class="actions" id="hActions"></div>
+</div></header>
+<div class="wrap"><main id="app"><div class="loading">Chargement…</div></main></div>
+<div id="layer"></div>
+
+<script>
+/* Tout le contenu dynamique passe par textContent (jamais innerHTML) : pas de XSS possible via les saisies. */
+const S = { state:null, meId:null, view:'home', personId:null, busy:false };
+const PALETTE = ['#B3202A','#1F5D46','#C79A3B','#6B3E7A','#2B5C8A','#B5562B','#4A7C59','#8A3B5C'];
+const eur = new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'});
+
+function h(tag, props, ...kids){
+  const e = document.createElement(tag);
+  if (props) for (const [k,v] of Object.entries(props)){
+    if (k==='class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v!==false && v!=null) e.setAttribute(k, v);
+  }
+  kids.flat(Infinity).forEach(c => { if (c==null||c===false) return; e.append(c.nodeType ? c : String(c)); });
+  return e;
+}
+const API = 'COLLE_ICI_TON_URL_APPS_SCRIPT_/exec';   // URL du déploiement Apps Script (se termine par /exec)
+async function call(fn, arg = {}){
+  if (arg && typeof arg==='object' && S.tok) arg.token = S.tok;       // jeton de session ajouté à chaque appel
+  const r = await fetch(API, { method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},               // évite le blocage CORS (pas de preflight)
+    body: JSON.stringify({fn, arg}) });
+  const j = await r.json();
+  if (!j.ok) throw new Error(j.error);
+  return j.data;
+}
+function toast(msg, err){
+  const t = h('div',{class:'toast'+(err?' err':'')}, msg);
+  document.body.append(t); setTimeout(()=>t.remove(), 3200);
+}
+function clearSession(){ S.tok=null; S.meId=null; S.view='home'; store('noelTok',''); store('noelMe',''); }
+function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
+
+async function act(fn, ...args){           // action serveur + rafraîchissement
+  if (S.busy) return null; S.busy = true;
+  try {
+    const st = await call(fn, ...args);
+    if (st.token){ S.tok = st.token; store('noelTok', S.tok); }
+    if (st.me){ S.meId = st.me.id; store('noelMe', S.meId); S.view = (fn==='login'||fn==='addMember'&&st.token) ? 'home' : S.view; }
+    S.state = st; render(); return st;
+  }
+  catch(e){
+    const msg = (e && e.message || 'Erreur').replace(/^Error:\s*/,'');
+    toast(msg, true);
+    if (/^Session expirée/.test(msg)){ clearSession(); try{ S.state = await call('getState',{viewerId:''}); }catch(_){} render(); }
+    return null;
+  }
+  finally { S.busy = false; }
+}
+
+const member = id => S.state.members.find(m => m.id===id);
+const nameOf = id => (member(id)||{prenom:'?'}).prenom;
+function avatar(m){
+  const c = PALETTE[[...m.prenom].reduce((a,ch)=>a+ch.charCodeAt(0),0) % PALETTE.length];
+  return h('span',{class:'avatar',style:'background:'+c}, m.prenom.charAt(0).toUpperCase());
+}
+
+/* ---------- Modale générique ---------- */
+function openForm({title, fields, submit, onSubmit}){
+  const layer = document.getElementById('layer');
+  const inputs = {};
+  const close = () => layer.replaceChildren();
+  const form = h('form',{onsubmit: async ev => {
+      ev.preventDefault();
+      const vals = {}; for (const f of fields) vals[f.name] = inputs[f.name].value;
+      const btn = ev.target.querySelector('button[type=submit]'); btn.disabled = true;
+      const res = await onSubmit(vals);        // renvoyer false garde la fenêtre ouverte (erreur à corriger)
+      if (res === false) btn.disabled = false; else close();
+  }},
+    h('h3',null,title),
+    fields.map(f => {
+      const el = f.type==='textarea' ? h('textarea',{rows:3,maxlength:f.max||400,placeholder:f.placeholder||''})
+        : h('input',{type:f.type||'text',maxlength:f.max||120,placeholder:f.placeholder||'',step:f.step,min:f.min,autocomplete:f.auto||(f.type==='password'?'new-password':'off')});
+      if (f.required) el.required = true;
+      el.value = f.value==null ? '' : f.value;
+      inputs[f.name] = el;
+      return [h('label',null,f.label), el];
+    }),
+    h('div',{class:'row'}, h('button',{type:'button',class:'btn ghost',onclick:close},'Annuler'), h('button',{type:'submit',class:'btn'},submit||'Valider'))
+  );
+  layer.replaceChildren(h('div',{class:'overlay',onclick:e=>{ if(e.target.classList.contains('overlay')) close(); }}, h('div',{class:'modal'}, form)));
+  const first = Object.values(inputs)[0]; if (first) first.focus();
+}
+
+/* ---------- Vues ---------- */
+function render(){
+  const app = document.getElementById('app'), st = S.state;
+  const me = st.me;
+  document.getElementById('hSub').textContent = me ? 'Connecté : ' + me.prenom : '';
+  const acts = document.getElementById('hActions'); acts.replaceChildren();
+  if (me){
+    acts.append(
+      h('button',{class:'btn sm',onclick:()=>{S.view='recap';render();}},'Mes contributions'),
+      h('button',{class:'btn sm',onclick:async()=>{ const id=S.meId; try{ S.state = await call('logout',{viewerId:id}); }catch(e){ S.state.me=null; } clearSession(); S.state.me=null; render(); }},'Déconnexion'));
+  }
+  if (!me) return app.replaceChildren(pickerView());
+  if (S.view==='person') return app.replaceChildren(personView());
+  if (S.view==='recap') return app.replaceChildren(recapView());
+  app.replaceChildren(homeView());
+}
+
+function pickerView(){
+  const st = S.state;
+  return h('div',null,
+    h('div',{class:'hello'}, h('h2',null,'Qui es-tu ?'), h('p',null,'Choisis ton prénom pour entrer.')),
+    st.members.length ? h('div',{class:'grid'}, st.members.map(m =>
+      h('button',{class:'person',onclick:()=>askLogin(m)},
+        avatar(m), h('span',{class:'name'},m.prenom)))) : h('div',{class:'empty'},'Personne pour l’instant. Crée le premier membre ci-dessous.'),
+    h('div',{style:'text-align:center;margin-top:18px'}, h('button',{class:'btn green',onclick:askRegister},'Je ne suis pas dans la liste')));
+}
+
+const PWD_HINT = 'Mot de passe (6 caractères min.)';
+function askLogin(m){
+  const first = !m.claimed;   // membre ajouté par un proche : il choisit son mot de passe maintenant
+  openForm({
+    title: first ? 'Bienvenue '+m.prenom+', choisis ton mot de passe' : 'Salut '+m.prenom,
+    submit: first ? 'Créer mon mot de passe' : 'Entrer',
+    fields: [{name:'password',label:first?PWD_HINT:'Mot de passe',type:'password',required:true,max:100,auto:first?'new-password':'current-password'}]
+      .concat(first ? [{name:'confirm',label:'Confirme le mot de passe',type:'password',required:true,max:100}] : []),
+    onSubmit: async v => {
+      if (first && v.password!==v.confirm){ toast('Les deux mots de passe ne correspondent pas.', true); return false; }
+      return (await act('login',{memberId:m.id,password:v.password})) ? true : false;
+    }
+  });
+}
+function askRegister(){
+  openForm({
+    title:'Nouveau membre', submit:'Créer mon accès',
+    fields:[{name:'prenom',label:'Ton prénom',required:true,max:30},
+            {name:'password',label:PWD_HINT,type:'password',required:true,max:100},
+            {name:'confirm',label:'Confirme le mot de passe',type:'password',required:true,max:100}],
+    onSubmit: async v => {
+      if (v.password!==v.confirm){ toast('Les deux mots de passe ne correspondent pas.', true); return false; }
+      return (await act('addMember',{prenom:v.prenom,password:v.password})) ? true : false;
+    }
+  });
+}
+
+function homeView(){
+  const st = S.state;
+  return h('div',null,
+    h('div',{class:'bar'}, h('h2',null,'La famille')),
+    h('div',{class:'grid'}, st.members.map(m=>{
+      const ws = st.wishes.filter(w=>w.pourId===m.id);
+      const isMe = m.id===st.me.id;
+      const left = ws.filter(w=>!w.mine && !w.achete).length;
+      return h('button',{class:'person'+(isMe?' me':''),onclick:()=>{S.view='person';S.personId=m.id;render();}},
+        avatar(m), h('span',{class:'name'}, isMe ? 'Ma liste' : m.prenom),
+        h('span',{class:'meta'}, ws.length+' souhait'+(ws.length>1?'s':'') + (!isMe && ws.length ? ' · '+left+' à offrir' : '')));
+    })),
+    h('form',{class:'add-inline',onsubmit:async ev=>{ ev.preventDefault(); const i=ev.target.elements.p; if(!i.value.trim()) return; const v=i.value; i.value=''; await act('addMember',{prenom:v,viewerId:S.meId}); }},
+      h('input',{name:'p',maxlength:30,placeholder:'Ajouter un proche (il choisira son mot de passe)'}), h('button',{class:'btn green',type:'submit'},'Ajouter')));
+}
+
+function personView(){
+  const st = S.state, me = st.me, p = member(S.personId);
+  if (!p){ S.view='home'; return homeView(); }
+  const isMe = p.id===me.id;
+  const ws = st.wishes.filter(w=>w.pourId===p.id);
+  const back = h('button',{class:'btn ghost sm',onclick:()=>{S.view='home';render();}},'← Retour');
+  const addWish = (surprise)=> openForm({
+    title: surprise ? 'Idée surprise pour '+p.prenom : (isMe ? 'Un souhait pour moi' : 'Un souhait pour '+p.prenom),
+    fields:[{name:'titre',label:'Quoi ?',required:true,max:120},{name:'description',label:'Détails (optionnel)',type:'textarea',max:400}],
+    submit:'Ajouter',
+    onSubmit: v => act('addWish',{viewerId:me.id,pourId:p.id,titre:v.titre,description:v.description,surprise:surprise})
+  });
+  const editWish = w => openForm({
+    title:'Modifier', submit:'Enregistrer',
+    fields:[{name:'titre',label:'Quoi ?',required:true,value:w.titre,max:120},{name:'description',label:'Détails',type:'textarea',value:w.description,max:400}],
+    onSubmit: v => act('updateWish',{viewerId:me.id,id:w.id,titre:v.titre,description:v.description})
+  });
+  const actions = h('div',{class:'actions'}, h('button',{class:'btn',onclick:()=>addWish(false)}, isMe?'+ Ajouter un souhait':'+ Ajouter une idée'),
+    !isMe && h('button',{class:'btn green',onclick:()=>addWish(true)},'+ Idée surprise'));
+
+  const head = h('div',{class:'bar'}, h('h2',null, isMe ? 'Ma liste de Noël' : 'Liste de '+p.prenom), actions);
+  if (isMe){
+    return h('div',null, back, h('div',{style:'height:10px'}), head,
+      h('div',{class:'note'},'Tu ne vois ici que tes souhaits. La famille peut aussi y ajouter des idées : le reste reste secret.'),
+      ws.length ? ws.map(w=>wishCard(w,{editWish,me})) : h('div',{class:'empty'},'Aucun souhait pour l’instant.'));
+  }
+  const todo = ws.filter(w=>!w.achete), done = ws.filter(w=>w.achete);
+  // Souhaits classiques d'abord, puis un séparateur « Surprises ! » et les idées surprise.
+  const listOf = (items, emptyMsg) => {
+    if (!items.length) return h('div',{class:'empty'},emptyMsg);
+    const normal = items.filter(w=>!w.surprise), surp = items.filter(w=>w.surprise);
+    return [normal.map(w=>wishCard(w,{editWish,me})),
+            surp.length>0 && h('div',{class:'sep'},h('span',null,'Surprises !')),
+            surp.map(w=>wishCard(w,{editWish,me}))];
+  };
+  return h('div',null, back, h('div',{style:'height:10px'}), head,
+    h('div',{class:'note'},p.prenom+' ne voit ni les achats, ni les contributions, ni les surprises.'),
+    h('div',{class:'cols'},
+      h('div',{class:'section'}, h('h3',null,'Souhaits & idées',h('span',{class:'count'},todo.length)),
+        listOf(todo,'Rien à offrir pour l’instant.')),
+      h('div',{class:'section'}, h('h3',null,'Achats',h('span',{class:'count'},done.length)),
+        listOf(done,'Rien d’acheté pour l’instant.'))));
+}
+
+function wishCard(w, {editWish, me}){
+  const cs = S.state.contribs.filter(c=>c.souhaitId===w.id);
+  const total = cs.reduce((a,c)=>a+c.montant,0);
+  const tags = [];
+  if (!w.mine){
+    if (w.surprise) tags.push(h('span',{class:'tag gold'},'Surprise · idée de '+nameOf(w.ajouteParId)));
+    if (w.achete) tags.push(h('span',{class:'tag gold'},'Acheté par '+nameOf(w.acheteParId)));
+    cs.forEach(c=> tags.push(h('span',{class:'tag'+(c.parId===me.id?' x':''),title:c.note||'',
+      onclick: c.parId===me.id ? ()=>{ if(confirm('Retirer ta contribution ?')) act('deleteContribution',{viewerId:me.id,id:c.id}); } : null},
+      nameOf(c.parId)+' · '+eur.format(c.montant)+(c.parId===me.id?' ✕':''))));
+    if (cs.length) tags.push(h('span',{class:'tag gold total'},'Total '+eur.format(total)));
+  }
+  const row = h('div',{class:'row'});
+  if (!w.mine){
+    row.append(
+      h('button',{class:'btn sm green',onclick:()=>openForm({title:'Ma contribution',submit:'Enregistrer',
+        fields:[{name:'montant',label:'Montant (€)',type:'number',step:'0.01',min:'0.01',required:true},{name:'note',label:'Note (optionnel)',max:120}],
+        onSubmit:v=>act('addContribution',{viewerId:me.id,wishId:w.id,montant:v.montant,note:v.note})})},'Je contribue'),
+      h('button',{class:'btn sm ghost',onclick:()=>act('setBought',{viewerId:me.id,id:w.id,achete:!w.achete})}, w.achete?'Remettre à offrir':'Marquer acheté'));
+  }
+  row.append(h('span',{class:'sp'}),
+    h('button',{class:'lnk',onclick:()=>editWish(w)},'Modifier'),
+    h('button',{class:'lnk',onclick:()=>{ if(confirm('Supprimer « '+w.titre+' » ?')) act('deleteWish',{viewerId:me.id,id:w.id}); }},'Supprimer'));
+  return h('div',{class:'card'+(!w.mine&&w.achete?' done':'')+(!w.mine&&w.surprise?' surprise':'')},
+    h('div',{class:'top'}, h('div',null, h('div',{class:'title'},w.titre), w.description && h('div',{class:'desc'},w.description))),
+    tags.length>0 && h('div',{class:'tags'},tags), row);
+}
+
+function recapView(){
+  const st = S.state, me = st.me;
+  const mine = st.contribs.filter(c=>c.parId===me.id);
+  const byPerson = {};
+  mine.forEach(c=>{ const w = st.wishes.find(x=>x.id===c.souhaitId); if(!w) return; (byPerson[w.pourId] = byPerson[w.pourId]||[]).push({c,w}); });
+  const ids = Object.keys(byPerson);
+  const grand = mine.reduce((a,c)=>a+c.montant,0);
+  return h('div',null,
+    h('button',{class:'btn ghost sm',onclick:()=>{S.view='home';render();}},'← Retour'),
+    h('div',{class:'bar',style:'margin-top:10px'}, h('h2',null,'Mes contributions'), h('span',{class:'total'},'Total : '+eur.format(grand))),
+    ids.length ? ids.map(pid=>h('div',{class:'card'},
+      h('div',{class:'title'},'Pour '+nameOf(pid)+' · '+eur.format(byPerson[pid].reduce((a,x)=>a+x.c.montant,0))),
+      h('div',{class:'tags'}, byPerson[pid].map(x=>h('span',{class:'tag'}, x.w.titre+' · '+eur.format(x.c.montant))))))
+    : h('div',{class:'empty'},'Tu n’as encore rien indiqué. Sur la liste d’un proche, clique « Je contribue ».'));
+}
+
+/* ---------- Démarrage ---------- */
+(async function init(){
+  S.meId = store('noelMe') || null;
+  S.tok = store('noelTok') || null;
+  try {
+    S.state = await call('getState', {viewerId: S.meId || ''});
+    if (!S.state.me) clearSession();
+    render();
+  } catch(e){
+    document.getElementById('app').replaceChildren(h('div',{class:'empty'},'Impossible de charger les données. Recharge la page.'));
+  }
+})();
+</script>
+</body>
+</html>
