@@ -54,7 +54,7 @@ main{padding:14px 0 60px}
 .section h3 .count{background:var(--green-l);color:var(--green);font-family:'DM Sans',sans-serif;font-size:.8rem;border-radius:999px;padding:2px 10px}
 .card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 13px;margin-bottom:8px;box-shadow:0 2px 10px rgba(80,40,20,.06)}
 .grid.fam{display:block;column-width:320px;column-gap:10px}
-.ptile{break-inside:avoid;margin-bottom:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.ptile{cursor:pointer;break-inside:avoid;margin-bottom:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
 .ptile.me{border-color:var(--green);background:var(--green-l)}
 .ptop{display:flex;align-items:stretch}
 .pmain{flex:1;display:flex;align-items:center;gap:10px;text-align:left;background:none;box-shadow:none;border-radius:0;padding:12px;color:var(--ink);min-width:0}
@@ -272,7 +272,7 @@ function homeView(){
       const collapsed = !!S.closed[m.id];
       const toggle = ()=>{ S.closed[m.id] = !S.closed[m.id]; render(); };
       const go = ()=>{S.view='person';S.personId=m.id;render();};
-      return h('div',{class:'ptile'+(isMe?' me':'')},
+      return h('div',{class:'ptile'+(isMe?' me':''),onclick:e=>{ if(!e.target.closest('button') && !(window.getSelection&&String(window.getSelection()))) go(); }},
         h('div',{class:'ptop'},
           h('button',{class:'pmain',onclick:go,title:'Ouvrir la liste détaillée'}, avatar(m),
             h('div',{class:'ptxt'}, h('span',{class:'pname'}, isMe ? 'Ma liste' : m.prenom),
