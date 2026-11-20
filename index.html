@@ -70,6 +70,9 @@ main{padding:14px 0 60px}
 .wl{list-style:none;margin:0;padding:4px 14px 12px;display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--line)}
 .wl li{display:flex;gap:8px;align-items:flex-start;font-size:.85rem;line-height:1.3;overflow-wrap:anywhere}
 .wl-empty{padding:8px 14px 12px;color:var(--mute);font-size:.85rem;border-top:1px solid var(--line)}
+.wl li.surp{color:#7A5A12}
+.wl li.wsep{display:flex;align-items:center;gap:8px;color:#7A5A12;font-family:'Fraunces',serif;font-weight:700;font-size:.8rem;margin:4px 0 0}
+.wl li.wsep::before,.wl li.wsep::after{content:"";flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
 .wl .sur{color:#7A5A12;font-style:normal;font-size:.75rem}
 .st{flex:none;width:14px;height:14px;border-radius:50%;margin-top:1px;display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;line-height:1;color:#fff;font-weight:700;vertical-align:-2px}
 .st.ok{background:var(--green)}.st.part{background:#E9B400}.st.no{background:#D62C2C}.st.plain{background:var(--line)}
@@ -273,14 +276,18 @@ function homeView(){
           h('button',{class:'btn sm cta'+(isMe?'':' green'),onclick:go},isMe?'Ma liste':'Contribuer'),
           h('button',{class:'tog',title:collapsed?'Voir les souhaits':'Masquer les souhaits','aria-expanded':String(!collapsed),onclick:toggle},
             h('span',{class:'tri'+(collapsed?'':' on')},'›'))),
-        !collapsed && (ws.length ? h('ul',{class:'wl'}, ws.map(w=>{
-          const hasC = !w.mine && st.contribs.some(c=>c.souhaitId===w.id);
-          const dot = w.mine ? h('span',{class:'st plain'})
-            : w.achete ? h('span',{class:'st ok',title:'Acheté'},'✓')
-            : hasC ? h('span',{class:'st part',title:'Contribué'})
-            : h('span',{class:'st no',title:'Pas encore couvert'});
-          return h('li',null, dot, h('span',null, w.titre, (!w.mine && w.surprise) ? h('em',{class:'sur'},' · surprise') : null));
-        })) : h('div',{class:'wl-empty'},'Aucun souhait pour l’instant.')));
+        !collapsed && (ws.length ? (()=>{
+          const li = w=>{
+            const hasC = !w.mine && st.contribs.some(c=>c.souhaitId===w.id);
+            const dot = w.mine ? h('span',{class:'st plain'})
+              : w.achete ? h('span',{class:'st ok',title:'Acheté'},'✓')
+              : hasC ? h('span',{class:'st part',title:'Contribué'})
+              : h('span',{class:'st no',title:'Pas encore couvert'});
+            return h('li',{class:(!w.mine&&w.surprise)?'surp':null}, dot, h('span',null,w.titre));
+          };
+          const normal = ws.filter(w=>w.mine||!w.surprise), surp = ws.filter(w=>!w.mine&&w.surprise);
+          return h('ul',{class:'wl'}, normal.map(li), surp.length>0 && h('li',{class:'wsep'},h('span',null,'Surprises')), surp.map(li));
+        })() : h('div',{class:'wl-empty'},'Aucun souhait pour l’instant.')));
     })),
     h('form',{class:'add-inline',onsubmit:async ev=>{ ev.preventDefault(); const i=ev.target.elements.p; if(!i.value.trim()) return; const v=i.value; i.value=''; await act('addMember',{prenom:v,viewerId:S.meId}); }},
       h('input',{name:'p',maxlength:30,placeholder:'Ajouter un proche (il choisira son mot de passe)'}), h('button',{class:'btn green',type:'submit'},'Ajouter')));
@@ -360,18 +367,27 @@ function wishCard(w, {editWish, me}){
 
 function recapView(){
   const st = S.state, me = st.me;
-  const mine = st.contribs.filter(c=>c.parId===me.id);
-  const byPerson = {};
-  mine.forEach(c=>{ const w = st.wishes.find(x=>x.id===c.souhaitId); if(!w) return; (byPerson[w.pourId] = byPerson[w.pourId]||[]).push({c,w}); });
+  const byPerson = {};   // pourId -> { wishId -> {w, montant, achat} }
+  const slot = w => ((byPerson[w.pourId] = byPerson[w.pourId]||{})[w.id] = (byPerson[w.pourId]||{})[w.id] || {w, montant:0, achat:false});
+  st.contribs.filter(c=>c.parId===me.id).forEach(c=>{ const w = st.wishes.find(x=>x.id===c.souhaitId); if(w) slot(w).montant += c.montant; });
+  st.wishes.filter(w=>!w.mine && w.achete && w.acheteParId===me.id).forEach(w=>{ slot(w).achat = true; });
   const ids = Object.keys(byPerson);
-  const grand = mine.reduce((a,c)=>a+c.montant,0);
+  const grand = ids.reduce((a,pid)=>a+Object.values(byPerson[pid]).reduce((s,x)=>s+x.montant,0),0);
+  const nbAchats = ids.reduce((a,pid)=>a+Object.values(byPerson[pid]).filter(x=>x.achat).length,0);
   return h('div',null,
     h('button',{class:'btn ghost sm',onclick:()=>{S.view='home';render();}},'← Retour'),
-    h('div',{class:'bar',style:'margin-top:10px'}, h('h2',null,'Mes contributions'), h('span',{class:'total'},'Total : '+eur.format(grand))),
-    ids.length ? ids.map(pid=>h('div',{class:'card'},
-      h('div',{class:'title'},'Pour '+nameOf(pid)+' · '+eur.format(byPerson[pid].reduce((a,x)=>a+x.c.montant,0))),
-      h('div',{class:'tags'}, byPerson[pid].map(x=>h('span',{class:'tag'}, x.w.titre+' · '+eur.format(x.c.montant))))))
-    : h('div',{class:'empty'},'Tu n’as encore rien indiqué. Sur la liste d’un proche, clique « Je contribue ».'));
+    h('div',{class:'bar',style:'margin-top:10px'}, h('h2',null,'Mes contributions & achats'),
+      h('span',{class:'total'},'Contribué : '+eur.format(grand)+(nbAchats?' · '+nbAchats+' achat'+(nbAchats>1?'s':''):''))),
+    ids.length ? ids.map(pid=>{
+      const items = Object.values(byPerson[pid]);
+      return h('div',{class:'card'},
+        h('div',{class:'title'},'Pour '+nameOf(pid)+' · '+eur.format(items.reduce((s,x)=>s+x.montant,0))),
+        h('ul',{class:'wl',style:'border:0;padding:8px 0 0'}, items.map(x=>
+          h('li',null, x.achat ? h('span',{class:'st ok'},'✓') : h('span',{class:'st part'}),
+            h('span',null, x.w.titre,
+              x.achat ? h('em',{class:'sur'},' · acheté par moi') : null,
+              x.montant>0 ? h('em',{class:'sur'},' · '+eur.format(x.montant)) : null)))));
+    }) : h('div',{class:'empty'},'Rien pour l’instant. Sur la liste d’un proche, clique « Je contribue » ou « Marquer acheté ».'));
 }
 
 /* ---------- Démarrage ---------- */
