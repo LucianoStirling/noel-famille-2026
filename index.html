@@ -264,7 +264,7 @@ function homeView(){
   const st = S.state;
   return h('div',null,
     h('div',{class:'bar'}, h('h2',null,'La famille'),
-      h('span',{class:'legend'}, h('span',{class:'st ok'},'✓'),' acheté ', h('span',{class:'st part'}),' contribué ', h('span',{class:'st no'}),' à couvrir')),
+      h('span',{class:'legend'}, h('span',{class:'st ok'},'✓'),' pris en charge ', h('span',{class:'st part'}),' contribué ', h('span',{class:'st no'}),' à couvrir')),
     h('div',{class:'grid fam'}, st.members.map(m=>{
       const ws = st.wishes.filter(w=>w.pourId===m.id);
       const isMe = m.id===st.me.id;
@@ -284,7 +284,7 @@ function homeView(){
           const li = w=>{
             const hasC = !w.mine && st.contribs.some(c=>c.souhaitId===w.id);
             const dot = w.mine ? h('span',{class:'st plain'})
-              : w.achete ? h('span',{class:'st ok',title:'Acheté'},'✓')
+              : w.achete ? h('span',{class:'st ok',title:'Pris en charge'},'✓')
               : hasC ? h('span',{class:'st part',title:'Contribué'})
               : h('span',{class:'st no',title:'Pas encore couvert'});
             return h('li',{class:(!w.mine&&w.surprise)?'surp':null}, dot, h('span',null,w.titre));
@@ -347,10 +347,13 @@ function wishCard(w, {editWish, me}){
   const tags = [];
   if (!w.mine){
     if (w.surprise) tags.push(h('span',{class:'tag gold'},'Surprise · idée de '+nameOf(w.ajouteParId)));
-    if (w.achete) tags.push(h('span',{class:'tag gold'},'Acheté par '+nameOf(w.acheteParId)));
-    cs.forEach(c=> tags.push(h('span',{class:'tag'+(c.parId===me.id?' x':''),title:c.note||'',
-      onclick: c.parId===me.id ? ()=>{ if(confirm('Retirer ta contribution ?')) act('deleteContribution',{viewerId:me.id,id:c.id}); } : null},
-      nameOf(c.parId)+' · '+eur.format(c.montant)+(c.parId===me.id?' ✕':''))));
+    if (w.achete) tags.push(h('span',{class:'tag gold'},'Pris en charge par '+nameOf(w.acheteParId)));
+    cs.forEach(c=> tags.push(h('span',{class:'tag'+(c.parId===me.id?' x':''),
+      onclick: c.parId===me.id ? ()=>openForm({title:'Ma contribution',submit:'Enregistrer',
+        fields:[{name:'montant',label:'Montant (€) · mets 0 pour la retirer',type:'number',step:'0.01',min:'0',required:true,value:c.montant},{name:'note',label:'Note (optionnel)',max:120,value:c.note}],
+        onSubmit:v=>act('updateContribution',{viewerId:me.id,id:c.id,montant:v.montant,note:v.note})}) : null,
+      title:c.parId===me.id?'Modifier ma contribution':(c.note||'')},
+      nameOf(c.parId)+' · '+eur.format(c.montant)+(c.parId===me.id?' ✎':''))));
     if (cs.length) tags.push(h('span',{class:'tag gold total'},'Total '+eur.format(total)));
   }
   const row = h('div',{class:'row'});
@@ -359,7 +362,7 @@ function wishCard(w, {editWish, me}){
       h('button',{class:'btn sm green',onclick:()=>openForm({title:'Ma contribution',submit:'Enregistrer',
         fields:[{name:'montant',label:'Montant (€)',type:'number',step:'0.01',min:'0.01',required:true},{name:'note',label:'Note (optionnel)',max:120}],
         onSubmit:v=>act('addContribution',{viewerId:me.id,wishId:w.id,montant:v.montant,note:v.note})})},'Je contribue'),
-      h('button',{class:'btn sm ghost',onclick:()=>act('setBought',{viewerId:me.id,id:w.id,achete:!w.achete})}, w.achete?'Remettre à offrir':'Marquer acheté'));
+      h('button',{class:'btn sm ghost',onclick:()=>act('setBought',{viewerId:me.id,id:w.id,achete:!w.achete})}, w.achete?'Remettre à offrir':'Je m’en occupe'));
   }
   if (w.canEdit) row.append(h('span',{class:'sp'}),
     h('button',{class:'lnk',onclick:()=>editWish(w)},'Modifier'),
@@ -369,11 +372,19 @@ function wishCard(w, {editWish, me}){
     tags.length>0 && h('div',{class:'tags'},tags), row);
 }
 
+function editContrib(c){
+  const me = S.state.me;
+  openForm({title:'Ma contribution',submit:'Enregistrer',
+    fields:[{name:'montant',label:'Montant (€) · mets 0 pour la retirer',type:'number',step:'0.01',min:'0',required:true,value:c.montant},
+            {name:'note',label:'Note (optionnel)',max:120,value:c.note}],
+    onSubmit:v=>act('updateContribution',{viewerId:me.id,id:c.id,montant:v.montant,note:v.note})});
+}
+
 function recapView(){
   const st = S.state, me = st.me;
   const byPerson = {};   // pourId -> { wishId -> {w, montant, achat} }
-  const slot = w => ((byPerson[w.pourId] = byPerson[w.pourId]||{})[w.id] = (byPerson[w.pourId]||{})[w.id] || {w, montant:0, achat:false});
-  st.contribs.filter(c=>c.parId===me.id).forEach(c=>{ const w = st.wishes.find(x=>x.id===c.souhaitId); if(w) slot(w).montant += c.montant; });
+  const slot = w => ((byPerson[w.pourId] = byPerson[w.pourId]||{})[w.id] = (byPerson[w.pourId]||{})[w.id] || {w, montant:0, achat:false, cs:[]});
+  st.contribs.filter(c=>c.parId===me.id).forEach(c=>{ const w = st.wishes.find(x=>x.id===c.souhaitId); if(w){ const s = slot(w); s.montant += c.montant; s.cs.push(c); } });
   st.wishes.filter(w=>!w.mine && w.achete && w.acheteParId===me.id).forEach(w=>{ slot(w).achat = true; });
   const ids = Object.keys(byPerson);
   const grand = ids.reduce((a,pid)=>a+Object.values(byPerson[pid]).reduce((s,x)=>s+x.montant,0),0);
@@ -389,9 +400,9 @@ function recapView(){
         h('ul',{class:'wl',style:'border:0;padding:8px 0 0'}, items.map(x=>
           h('li',null, x.achat ? h('span',{class:'st ok'},'✓') : h('span',{class:'st part'}),
             h('span',null, x.w.titre,
-              x.achat ? h('em',{class:'sur'},' · acheté par moi') : null,
-              x.montant>0 ? h('em',{class:'sur'},' · '+eur.format(x.montant)) : null)))));
-    }) : h('div',{class:'empty'},'Rien pour l’instant. Sur la liste d’un proche, clique « Je contribue » ou « Marquer acheté ».'));
+              x.achat ? h('em',{class:'sur'},' · pris en charge par moi') : null,
+              x.cs.map(c=>h('span',{class:'tag x',style:'margin-left:6px',title:'Modifier ma contribution',onclick:()=>editContrib(c)},eur.format(c.montant)+' ✎')))))));
+    }) : h('div',{class:'empty'},'Rien pour l’instant. Sur la liste d’un proche, clique « Je contribue » ou « Je m’en occupe ».'));
 }
 
 /* ---------- Démarrage ---------- */
