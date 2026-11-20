@@ -103,6 +103,7 @@ main{padding:14px 0 60px}
 .hello{text-align:center;padding:30px 0 10px}
 .hello h2{font-size:2rem}
 .hello p{color:var(--mute)}
+.hint{text-align:center;color:var(--mute);font-size:.78rem;margin:8px 0 0}
 .add-inline{display:flex;gap:8px;max-width:420px;margin:24px auto 0}
 .add-inline input{flex:1;font:inherit;font-size:16px;padding:.65em 1em;border:1.5px solid var(--line);border-radius:999px;background:#fff}
 .loading{text-align:center;color:var(--mute);padding:60px 0}
@@ -294,7 +295,8 @@ function homeView(){
         })() : h('div',{class:'wl-empty'},'Aucun souhait pour l’instant.')));
     })),
     h('form',{class:'add-inline',onsubmit:async ev=>{ ev.preventDefault(); const i=ev.target.elements.p; if(!i.value.trim()) return; const v=i.value; i.value=''; await act('addMember',{prenom:v,viewerId:S.meId}); }},
-      h('input',{name:'p',maxlength:30,placeholder:'Ajouter un proche (il choisira son mot de passe)'}), h('button',{class:'btn green',type:'submit'},'Ajouter')));
+      h('input',{name:'p',maxlength:30,placeholder:'Ajouter un proche (prénom)'}), h('button',{class:'btn green',type:'submit'},'Ajouter')),
+    h('p',{class:'hint'},'Il choisira son mot de passe à sa première connexion.'));
 }
 
 function personView(){
