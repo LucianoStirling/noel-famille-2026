@@ -277,12 +277,13 @@ function askRegister(){
   });
 }
 
+const byName = (a,b)=>a.prenom.localeCompare(b.prenom,'fr',{sensitivity:'base'});
 function homeView(){
   const st = S.state;
   return h('div',null,
     h('div',{class:'bar'}, h('h2',null,'La famille'),
       h('span',{class:'legend'}, h('span',{class:'st ok'},'✓'),' pris en charge ', h('span',{class:'st part'}),' contribué ', h('span',{class:'st no'}),' à couvrir')),
-    h('div',{class:'grid fam'}, st.members.map(m=>{
+    h('div',{class:'grid fam'}, [st.members.find(m=>m.id===st.me.id)].concat(st.members.filter(m=>m.id!==st.me.id).sort(byName)).map(m=>{
       const ws = st.wishes.filter(w=>w.pourId===m.id);
       const isMe = m.id===st.me.id;
       const left = ws.filter(w=>!w.mine && !w.achete).length;
@@ -443,6 +444,7 @@ function recapView(){
   st.wishes.filter(w=>!w.mine && w.achete && w.acheteParId===me.id).forEach(w=>{ slot(w).achat = true; });
   const ids = Object.keys(byPerson);
   const grand = ids.reduce((a,pid)=>a+Object.values(byPerson[pid]).reduce((s,x)=>s+x.montant,0),0);
+  const others = st.members.filter(m=>m.id!==me.id && !byPerson[m.id]).sort(byName);   // personnes pour qui je n'ai rien fait
   const nbAchats = ids.reduce((a,pid)=>a+Object.values(byPerson[pid]).filter(x=>x.achat).length,0);
   return h('div',null,
     h('button',{class:'btn ghost sm',onclick:()=>{S.view='home';render();}},'← Retour'),
@@ -457,7 +459,13 @@ function recapView(){
             h('span',null, x.w.titre,
               x.achat ? h('em',{class:'sur'},' · pris en charge par moi') : null,
               x.cs.map(c=>h('span',{class:'tag x',style:'margin-left:6px',title:'Modifier ma contribution',onclick:()=>editContrib(c)},eur.format(c.montant)+' ✎')))))));
-    }) : h('div',{class:'empty'},'Rien pour l’instant. Sur la liste d’un proche, clique « Je contribue » ou « Je m’en occupe ».'));
+    }) : h('div',{class:'empty'},'Rien pour l’instant. Sur la liste d’un proche, clique « Je contribue » ou « Je m’en occupe ».'),
+    others.length>0 && h('div',{class:'sep',style:'margin-top:26px'},h('span',null,'Pas encore de contribution')),
+    others.length>0 && h('div',{class:'grid'}, others.map(m=>{
+      const n = st.wishes.filter(w=>w.pourId===m.id).length;
+      return h('button',{class:'person',onclick:()=>{S.view='person';S.personId=m.id;render();}},
+        avatar(m), h('span',{class:'name'},m.prenom), h('span',{class:'meta'}, n+' souhait'+(n>1?'s':'')));
+    })));
 }
 
 /* ---------- Démarrage ---------- */
