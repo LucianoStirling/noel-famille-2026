@@ -198,7 +198,11 @@ function openForm({title, fields, submit, onSubmit}){
     }),
     h('div',{class:'row'}, h('button',{type:'button',class:'btn ghost',onclick:close},'Annuler'), h('button',{type:'submit',class:'btn'},submit||'Valider'))
   );
-  layer.replaceChildren(h('div',{class:'overlay',onclick:e=>{ if(e.target.classList.contains('overlay')) close(); }}, h('div',{class:'modal'}, form)));
+  let downOnOverlay = false;   // ferme seulement si le clic COMMENCE et FINIT sur le fond (pas lors d'une sélection de texte qui déborde)
+  layer.replaceChildren(h('div',{class:'overlay',
+    onmousedown:e=>{ downOnOverlay = e.target.classList.contains('overlay'); },
+    onclick:e=>{ if(downOnOverlay && e.target.classList.contains('overlay')) close(); downOnOverlay = false; }},
+    h('div',{class:'modal'}, form)));
   const first = Object.values(inputs)[0]; if (first) first.focus();
 }
 
